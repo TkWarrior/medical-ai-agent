@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Bot {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  uid         String   @unique              
+  name        String
+  domain      String   @default("medical")  
+  precallUrl  String
+  functionUrl String
+  postcallUrl String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  calls CallLog[] 
+}
+
+model CallLog {
+  id            String    @id @default(auto()) @map("_id") @db.ObjectId
+  callId        String    @unique             
+  botId         String    @db.ObjectId
+  bot           Bot       @relation(fields: [botId], references: [id])
+  incomingAt    DateTime  @default(now())
+  endedAt       DateTime?
+  preCallData   Json?
+  functionCalls Json[]    @default([])
+  transcript    String?
+  postCallData  Json?
+  status        String    @default("completed") 
+}
+
