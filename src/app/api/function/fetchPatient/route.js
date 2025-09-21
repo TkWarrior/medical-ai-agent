@@ -4,9 +4,10 @@ import { prisma } from "@/lib/prisma";
 
 export async function POST(NextRequest) {
   try {
-    const { callId, medicalId } = await req.json();
+    const body = await req.json();
+    const { callId, medicalId } = body;
 
-
+    console.log("body :", body)
     const patient = {
       medicalId,
       name: "Asha Patel",

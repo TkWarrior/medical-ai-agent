@@ -7,7 +7,7 @@ export async function POST(NextRequest) {
     const body = await req.json();
 
     const { callId, transcript, metadata } = body;
-
+    console.log("body" ,body )
    
     await prisma.callLog.update({
       where: { callId },
