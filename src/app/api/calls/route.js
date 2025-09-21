@@ -8,6 +8,7 @@ export async function GET() {
       orderBy: { incomingAt: "desc" },
       include: { bot: true }, 
     });
+    console.log("calls data :", calls)
     return NextResponse.json(calls);
   } catch (err) {
     console.error("Error fetching calls:", err);

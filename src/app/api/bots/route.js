@@ -7,6 +7,7 @@ export async function GET() {
     const bots = await prisma.bot.findMany({
       orderBy: { createdAt: "desc" },
     });
+    console.log("Bots body :", bots)
     return NextResponse.json(bots);
   } catch (err) {
     console.error("Error fetching bots:", err);

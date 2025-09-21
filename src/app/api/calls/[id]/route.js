@@ -7,7 +7,7 @@ export async function GET(req, { params }) {
       where: { id: params.id },
       include: { bot: true },
     });
-
+    console.log("cal by id :", call)
     if (!call) {
       return NextResponse.json({ error: "Call not found" }, { status: 404 });
     }
