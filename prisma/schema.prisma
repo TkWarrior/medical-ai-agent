@@ -31,7 +31,7 @@ model Bot {
 model CallLog {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   callId        String    @unique             
-  botId         String    @db.ObjectId
+  botId         String    
   bot           Bot       @relation(fields: [botId], references: [id])
   incomingAt    DateTime  @default(now())
   endedAt       DateTime?
