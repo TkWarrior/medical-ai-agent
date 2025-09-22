@@ -32,7 +32,7 @@ model CallLog {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
   callId        String    @unique             
   botId         String    
-  bot           Bot       @relation(fields: [botId], references: [id])
+  bot           Bot       @relation(fields: [botId], references: [uid])
   incomingAt    DateTime  @default(now())
   endedAt       DateTime?
   preCallData   Json?
