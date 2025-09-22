@@ -1,8 +1,8 @@
 
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { NextResponse } from "next/server";
+import { prisma } from "@/app/lib/prisma";
 
-export async function POST(NextRequest) {
+export async function POST(req) {
   try {
     const body = await req.json();
 
@@ -10,9 +10,9 @@ export async function POST(NextRequest) {
     console.log("body" ,body )
    
     await prisma.callLog.update({
-      where: { callId },
+      where: { callId: sessionId },
       data: {
-        transcript,
+        transcript : transcript ? JSON.stringify(transcript):null,
         postCallData: metadata,
         status: "completed",
         endedAt: new Date(),

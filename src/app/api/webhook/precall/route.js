@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma"; 
+import { prisma } from "@/app/lib/prisma";
 
-export async function POST(NextRequest) {
+export async function POST(req) {
   try {
     const body = await req.json();
 
@@ -20,7 +20,7 @@ export async function POST(NextRequest) {
     await prisma.callLog.create({
       data: {
         callId: body.callId || `call-${Date.now()}`,
-        botId: body.botId, 
+        botId: body.call.bot_id, 
         preCallData,
         status: "initiated",
       },
