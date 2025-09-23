@@ -10,7 +10,7 @@ export async function POST(req) {
     console.log("body" ,body )
    
     await prisma.callLog.update({
-      where: { callId: sessionId },
+      where: { callId },
       data: {
         transcript : transcript ? JSON.stringify(transcript):null,
         postCallData: metadata,
