@@ -28,9 +28,26 @@ model Bot {
   calls CallLog[] 
 }
 
+model Patient {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  patientId String   @unique             
+  name      String
+  dob       DateTime
+  allergies String[]
+  notes     String?
+  lastVisit DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  calls CallLog[]   
+}
+
 model CallLog {
   id            String    @id @default(auto()) @map("_id") @db.ObjectId
-  callId        String    @unique             
+  callId        String    @unique  
+  patientId  String?   @db.ObjectId
+  patient    Patient?  @relation(fields: [patientId], references: [id])
   botId         String    
   bot           Bot       @relation(fields: [botId], references: [uid])
   incomingAt    DateTime  @default(now())
