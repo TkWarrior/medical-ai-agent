@@ -5,17 +5,20 @@ export async function POST(req) {
   try {
     const body = await req.json();
 
-    console.log("body", body);
-   
-    const preCallData = {
-      patientId: "P-12345",
-      name: "Asha Patel",
-      dob: "1982-04-15",
-      allergies: ["penicillin"],
-      lastVisit: "2024-08-12",
-      notes: "Hypertension — follow-up due",
-    };
+   const patient = await prisma.patient.findFirst({
+     where: { patientId: "P-12345" }, 
+   });
 
+   const preCallData = patient
+     ? {
+         patientId: patient.patientId,
+         name: patient.name,
+         dob: patient.dob,
+         allergies: patient.allergies,
+         lastVisit: patient.lastVisit,
+         notes: patient.notes,
+       }
+     : { message: "No patient found" };
   
     await prisma.callLog.create({
       data: {
