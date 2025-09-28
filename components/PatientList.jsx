@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
-import AddPatientModal from "./AddPatientModal";
+import PatientForm from "./PatientForm";
 
-export default function PatientManager({ initialPatients }) {
+export default function PatientList({ initialPatients }) {
   const [patients, setPatients] = useState(initialPatients || []);
   const [open, setOpen] = useState(false);
   const [editingPatient, setEditingPatient] = useState(null);
@@ -49,7 +49,7 @@ export default function PatientManager({ initialPatients }) {
       </button>
 
       {open && (
-        <AddPatientModal
+        <PatientForm
           onClose={() => setOpen(false)}
           onPatientAdded={handlePatientAdded}
           onPatientUpdated = {handlePatientUpdated}

@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 
-export default function AddPatientModal({
+export default function PatientForm({
   onClose,
   onPatientAdded,
   onPatientUpdated,
