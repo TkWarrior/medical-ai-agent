@@ -1,4 +1,5 @@
-import CallsManager from "@/components/CallsManager";
+import CallsList from "../../../components/CallList";
+
 
 export default async function CallsPage() {
   const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/calls`, {
@@ -9,7 +10,7 @@ export default async function CallsPage() {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-2xl font-bold mb-6">📞 Calls Dashboard</h1>
-      <CallsManager initialCalls={calls} />
+      <CallsList initialCall = {calls}/>
     </div>
   );
 }
