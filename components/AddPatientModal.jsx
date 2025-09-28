@@ -64,7 +64,9 @@ export default function AddPatientModal({ onClose, onPatientAdded }) {
           ✖
         </button>
 
-        <h2 className="text-xl font-semibold mb-4 text-black">Add New Patient</h2>
+        <h2 className="text-xl font-semibold mb-4 text-black">
+          Add New Patient
+        </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
