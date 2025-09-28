@@ -6,11 +6,11 @@ export async function POST(req){
     try {
          const body = await req.json();
 
-         const { patientID, name, dob, allergies, notes, lastVisit } = body;
+         const { patientId, name, dob, allergies, notes, lastVisit } = body;
 
-         const patient = prisma.patient.create({
+         const patient = await prisma.patient.create({
            data: {
-             patientID,
+             patientId,
              name,
              dob: new Date(dob),
              allergies,
@@ -18,7 +18,7 @@ export async function POST(req){
              lastVisit: lastVisit ? new Date(lastVisit) : null,
            },
          });
-
+         console.log("patient : ", patient)
          return NextResponse.json({ success: true, patient });
     } catch (error) {
         console.error(error);
