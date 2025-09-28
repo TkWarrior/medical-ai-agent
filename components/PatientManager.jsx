@@ -5,11 +5,44 @@ import AddPatientModal from "./AddPatientModal";
 export default function PatientManager({ initialPatients }) {
   const [patients, setPatients] = useState(initialPatients || []);
   const [open, setOpen] = useState(false);
+  const [editingPatient, setEditingPatient] = useState(null);
+
+  const handlePatientAdded = (newPatient) => {
+    setPatients([...patients, newPatient]);
+  };
+  
+  const handlePatientUpdated = (updatedPatient) => {
+    setPatients(
+      patients.map((p) =>
+        p.patientId === updatedPatient.patientId ? updatedPatient : p
+      )
+    );
+  };
+
+  const handleDelete = async (patientId) => {
+    if (!confirm("Are you sure you want to delete this patient?")) return;
+
+    try {
+      const res = await fetch(`/api/patients/${patientId}`, {
+        method: "DELETE",
+      });
+      if (res.ok) {
+        setPatients(patients.filter((p) => p.patientId !== patientId));
+      } else {
+        alert("Failed to delete patient");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error deleting patient");
+    }
+  };
 
   return (
     <div>
       <button
-        onClick={() => setOpen(true)}
+        onClick={() => {
+            setEditingPatient(null);
+            setOpen(true)}}
         className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
       >
         ➕ Add Patient
@@ -18,9 +51,9 @@ export default function PatientManager({ initialPatients }) {
       {open && (
         <AddPatientModal
           onClose={() => setOpen(false)}
-          onPatientAdded={(newPatient) =>
-            setPatients([...patients, newPatient])
-          }
+          onPatientAdded={handlePatientAdded}
+          onPatientUpdated = {handlePatientUpdated}
+          patient = {editingPatient}
         />
       )}
       <table className="mt-6 w-full border">

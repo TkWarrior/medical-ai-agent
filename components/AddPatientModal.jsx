@@ -1,7 +1,12 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export default function AddPatientModal({ onClose, onPatientAdded }) {
+export default function AddPatientModal({
+  onClose,
+  onPatientAdded,
+  onPatientUpdated,
+  patient, // if passed → Edit mode
+}) {
   const [form, setForm] = useState({
     patientId: "",
     name: "",
@@ -11,6 +16,21 @@ export default function AddPatientModal({ onClose, onPatientAdded }) {
     lastVisit: "",
   });
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (patient) {
+      setForm({
+        patientId: patient.patientId,
+        name: patient.name,
+        // dob: patient.dob ? patient.dob.split("T")[0] : "",
+        dob: patient.dob,
+        allergies: patient.allergies?.join(",") || "",
+        notes: patient.notes || "",
+        // lastVisit: patient.lastVisit ? patient.lastVisit.split("T")[0] : "",
+        lastVisit: patient.lastVisit,
+      });
+    } 
+  }, [patient]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -22,29 +42,43 @@ export default function AddPatientModal({ onClose, onPatientAdded }) {
     setLoading(true);
 
     try {
-      const res = await fetch("/api/patients", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          patientId: form.patientId,
-          name: form.name,
-          dob: form.dob ? new Date(form.dob).toISOString() : null,
-          allergies: form.allergies ? form.allergies.split(",") : [],
-          notes: form.notes,
-          lastVisit: form.lastVisit
-            ? new Date(form.lastVisit).toISOString()
-            : null,
-        }),
-      });
+      const payload = {
+        patientId: form.patientId,
+        name: form.name,
+        dob: form.dob ? new Date(form.dob).toISOString() : null,
+        allergies: form.allergies ? form.allergies.split(",") : [],
+        notes: form.notes,
+        lastVisit: form.lastVisit
+          ? new Date(form.lastVisit).toISOString()
+          : null,
+      };
 
-      const data = await res.json();
+      let res, data;
 
-      if (res.ok) {
-        onPatientAdded(data.patient); // update parent state
-        onClose(); // close modal
+      if (patient) {
+        // Update existing
+        res = await fetch(`/api/patients/${patient.patientId}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        data = await res.json();
+
+        if (res.ok) onPatientUpdated(data.patient);
       } else {
-        alert(data.error || "Failed to create patient");
+        // Create new
+        res = await fetch("/api/patients", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+        data = await res.json();
+
+        if (res.ok) onPatientAdded(data.patient);
       }
+
+      if (res.ok) onClose();
+      else alert(data.error || "Operation failed");
     } catch (err) {
       console.error(err);
       alert("Something went wrong!");
@@ -65,18 +99,19 @@ export default function AddPatientModal({ onClose, onPatientAdded }) {
         </button>
 
         <h2 className="text-xl font-semibold mb-4 text-black">
-          Add New Patient
+          {patient ? "Edit Patient" : "Add New Patient"}
         </h2>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4 text-black">
           <input
             type="text"
             name="patientId"
-            placeholder="Patient ID (e.g. P-1001)"
+            placeholder="Patient ID"
             value={form.patientId}
             onChange={handleChange}
-            className="w-full border p-2 rounded text-black"
+            className="w-full border p-2 rounded"
             required
+            disabled={!!patient} // can't change ID in edit mode
           />
 
           <input
@@ -85,7 +120,7 @@ export default function AddPatientModal({ onClose, onPatientAdded }) {
             placeholder="Full Name"
             value={form.name}
             onChange={handleChange}
-            className="w-full border p-2 rounded text-black"
+            className="w-full border p-2 rounded"
             required
           />
 
@@ -94,7 +129,7 @@ export default function AddPatientModal({ onClose, onPatientAdded }) {
             name="dob"
             value={form.dob}
             onChange={handleChange}
-            className="w-full border p-2 rounded text-black"
+            className="w-full border p-2 rounded"
           />
 
           <input
@@ -103,7 +138,7 @@ export default function AddPatientModal({ onClose, onPatientAdded }) {
             placeholder="Allergies (comma separated)"
             value={form.allergies}
             onChange={handleChange}
-            className="w-full border p-2 rounded text-black"
+            className="w-full border p-2 rounded"
           />
 
           <textarea
@@ -111,7 +146,7 @@ export default function AddPatientModal({ onClose, onPatientAdded }) {
             placeholder="Notes"
             value={form.notes}
             onChange={handleChange}
-            className="w-full border p-2 rounded text-black"
+            className="w-full border p-2 rounded"
           />
 
           <input
@@ -119,7 +154,7 @@ export default function AddPatientModal({ onClose, onPatientAdded }) {
             name="lastVisit"
             value={form.lastVisit}
             onChange={handleChange}
-            className="w-full border p-2 rounded text-black"
+            className="w-full border p-2 rounded"
           />
 
           <button
@@ -127,7 +162,11 @@ export default function AddPatientModal({ onClose, onPatientAdded }) {
             disabled={loading}
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
           >
-            {loading ? "Saving..." : "Save Patient"}
+            {loading
+              ? "Saving..."
+              : patient
+              ? "Update Patient"
+              : "Save Patient"}
           </button>
         </form>
       </div>
